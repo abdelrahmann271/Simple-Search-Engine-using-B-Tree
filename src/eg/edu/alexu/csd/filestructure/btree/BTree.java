@@ -1,19 +1,22 @@
 package eg.edu.alexu.csd.filestructure.btree;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 
 public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 	
 	private int degree;
+	private int maxKeys;
 	private IBTreeNode<K, V> root = null;
-	private IBTreeNode<K, V> currentParent = null;
 	private IBTreeNode<K, V> NodeToInsertIn = null;
+	private Vector<IBTreeNode<K, V>> parents = new Vector<>();
 	
 	public BTree(int degree) {
 		// TODO Auto-generated constructor stub
 		this.degree = degree;
 		root = new BTreeNode<K,V>(degree);
+		this.maxKeys = degree-1;
 	}
 	
 	@Override
@@ -31,21 +34,11 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 	@Override
 	public void insert(K key, V value) {
 		// TODO Auto-generated method stub
-//		IBTreeNode<K, V> nodeToinsertIn = searchNode(root, key);
-//		if( nodeToinsertIn == null)
-//		{
-//			root.getChildren().add(0, null);
-//			root.getChildren().add(1, null);
-//			root.getKeys().add(0, key);
-//			root.getValues().add(0, value);
-//			root.setLeaf(true);
-//		}
-//		else {
-//			
-//		}
 		searchForInsert(this.root, key);
 		NodeToInsertIn.getKeys().add(key);
 		NodeToInsertIn.getValues().add(value);
+		
+		//Inserting at Leaf.
 		for(int i = NodeToInsertIn.getKeys().size()-1 ; i > 0 ; i--) {
 			
 			if( NodeToInsertIn.getKeys().get(i).compareTo(NodeToInsertIn.getKeys().get(i-1)) < 0 ) {
@@ -59,8 +52,11 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 			
 		}
 		int size = NodeToInsertIn.getKeys().size();
-		if( size  > degree) {
+		if( size  > maxKeys) {
 			int median = ( size-1 ) / 2 ;
+			
+			K medianKey = NodeToInsertIn.getKeys().get(median);
+			V medianValue = NodeToInsertIn.getValues().get(median);
 			
 			List<K> leftKeys = new ArrayList<K>();
 			List<V> leftValues = new ArrayList<V>();
@@ -78,29 +74,146 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 			
 			IBTreeNode<K, V> leftNode = new BTreeNode<>(degree);
 			IBTreeNode<K, V> rightNode = new BTreeNode<>(degree);
+			
+			leftNode.setLeaf(true);
+			rightNode.setLeaf(true);
+			
 			leftNode.setKeys(leftKeys);
 			leftNode.setValues(leftValues);
 			rightNode.setKeys(rightKeys);
 			rightNode.setValues(rightValues);
 			
+			insert_fixup( medianKey, medianValue, leftNode, rightNode	);
+			
 		}
+		
+		parents.clear();
+		
+	}
+	
+	
+	private void insert_fixup(K key , V value , IBTreeNode<K, V> left , IBTreeNode<K, V> right ) {
+		
+		IBTreeNode<K, V> currentParent = null;
+		Boolean flag = true;
+		//check if parent is null , its root.
+//		System.out.println(parents.size());
+		if(parents.size() == 0) {
+			currentParent = new BTreeNode<K,V>(this.degree);
+			this.root = currentParent;
+			currentParent.setLeaf(false);
+			flag = false;
+		} 
+		else {
+			currentParent = parents.get(parents.size()-1);
+			parents.remove(parents.size()-1);
+		}
+		
+
+		
+		currentParent.getKeys().add(key);
+		currentParent.getValues().add(value);
+		int i;
+		for( i = currentParent.getKeys().size()-1 ; i > 0 ; i--) {
+			
+			if( currentParent.getKeys().get(i).compareTo(currentParent.getKeys().get(i-1)) < 0 ) {
+				
+				swapKeys( currentParent.getKeys().get(i) , currentParent.getKeys().get(i-1)  );
+				swapValues(   currentParent.getValues().get(i) , currentParent.getValues().get(i-1) );
+			}
+			else {
+				break;
+			}
+			
+		}
+		//update children.
+		//because we inserted in a not leaf node.
+		//change i child and add the right child at the end and put it to i+1 .
+		if(flag) {
+			currentParent.getChildren().set(i, left);
+			currentParent.getChildren().add(right);
+			for(int j = currentParent.getChildren().size()-1 ; j>=i+2 ; j--) {
+				IBTreeNode<K, V> temp = currentParent.getChildren().get(j-1);
+				currentParent.getChildren().set(j-1, currentParent.getChildren().get(j));
+				currentParent.getChildren().set(j, temp);
+			}
+		}
+		else {
+			currentParent.getChildren().add(left);
+			currentParent.getChildren().add(right);
+		}
+
+		//check if it overloaded
+		int size = currentParent.getKeys().size();
+		//Don't forget to insert children at splitting!.
+		if( size  > maxKeys) {
+			int median = ( size-1 ) / 2 ;
+			
+			K medianKey = currentParent.getKeys().get(median);
+			V medianValue = currentParent.getValues().get(median);
+			
+			List<K> leftKeys = new ArrayList<K>();
+			List<V> leftValues = new ArrayList<V>();
+			List<K> rightKeys = new ArrayList<K>();
+			List<V> rightValues = new ArrayList<V>();
+			List<IBTreeNode<K, V>> leftChildren = new ArrayList<IBTreeNode<K,V>>();
+			List<IBTreeNode<K, V>> rightChildren = new ArrayList<IBTreeNode<K,V>>();
+			
+			for(int k = 0 ; k < median ; k++) {
+				leftKeys.add(currentParent.getKeys().get(k));
+				leftValues.add(currentParent.getValues().get(k));
+			}
+			for(int k = median + 1 ; k < size ; k++) {
+				rightKeys.add(currentParent.getKeys().get(k));
+				rightValues.add(currentParent.getValues().get(k));
+			}
+			
+			for(int k = 0 ; k <= median ; k++) {
+				leftChildren.add(currentParent.getChildren().get(k) );
+			}
+			for(int k = median+1 ; k < currentParent.getChildren().size() ; k++) {
+				rightChildren.add(currentParent.getChildren().get(k) );
+			}
+			
+			IBTreeNode<K, V> leftNode = new BTreeNode<>(degree);
+			IBTreeNode<K, V> rightNode = new BTreeNode<>(degree);
+			
+			leftNode.setLeaf(true);
+			rightNode.setLeaf(true);
+			
+			leftNode.setKeys(leftKeys);
+			leftNode.setValues(leftValues);
+			leftNode.setChildren(leftChildren);
+			
+			rightNode.setKeys(rightKeys);
+			rightNode.setValues(rightValues);
+			rightNode.setChildren(rightChildren);
+			
+			insert_fixup(medianKey, medianValue, leftNode, rightNode);
+			
+		}
+		
+		return;
+		
 	}
 	
 	private void searchForInsert(IBTreeNode<K, V> node , K key )  {
 		if(node.getKeys().size() == 0) {	//Insert at root.
-			
+			NodeToInsertIn = this.root;
 		}
 		for(int i = 0 ; i < node.getKeys().size() ; i++) {
 			//Continue searching into left.
 			if(node.isLeaf() == false  && node.getKeys().get(i).compareTo(key) > 0) {
 				
-				currentParent = node;
+				//currentParent = node;
+				parents.add(node);
 				searchForInsert(node.getChildren().get(i), key);
 				
 			}//Continue searching into right.
 			else if ( node.isLeaf() == false && i == node.getKeys().size()-1 && node.getKeys().get(i).compareTo(key) < 0 ) {
 				
-				currentParent = node;
+				//currentParent = node;
+				parents.add(node);
 				searchForInsert(node.getChildren().get(i+1), key);
 				
 			}//Key will be inserted in this node, Insert instead of this key and fix-up if necessary.
@@ -110,7 +223,7 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 				return;
 				
 			}//Insert at the end cause all the elements are smaller than it and it's the end.
-			else if (node.isLeaf() == true && i == node.getKeys().size()-1 && node.getKeys().get(i).compareTo(key) > 0 ) {
+			else if (node.isLeaf() == true && i == node.getKeys().size()-1 && node.getKeys().get(i).compareTo(key) < 0 ) {
 				
 				NodeToInsertIn = node;
 				return;
@@ -119,35 +232,6 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 		}
 	}
 	
-//	private IBTreeNode<K, V> searchNode(IBTreeNode<K, V> node,K key) {
-//		
-//		if(node.getKeys().size() == 0) //Insert in the root or key is not found in search.
-//			return null;
-//		for(int i = 0 ; i < node.getKeys().size() ; i++) {
-//			
-//			//The key is not in this node and it is not a leaf node , So we will continue searching.
-//			if( i+1 == node.getKeys().size() && !node.isLeaf() ) {
-//				
-//				return this.searchNode(node.getChildren().get(i+1) , key );
-//			}
-//			
-//			//The key is not in this node and it is a leaf node ,So we will return the node to insert in it or search in it
-//			if( i+1 == node.getKeys().size() && node.isLeaf() ) {
-//				return node;
-//			}
-//			
-//			//The key is found or it's not found
-//			if( node.getKeys().get(i).compareTo(key) >= 0 )
-//			{
-//				return node;
-//			}
-//			
-//			
-//			
-//		}
-//		return null;
-//	}
-
 	@Override
 	public V search(K key) {
 		// TODO Auto-generated method stub

@@ -1,6 +1,7 @@
 package eg.edu.alexu.csd.filestructure.btree;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BTreeNode<K extends Comparable<K>, V> implements IBTreeNode<K, V> {
@@ -8,9 +9,9 @@ public class BTreeNode<K extends Comparable<K>, V> implements IBTreeNode<K, V> {
 	private int numOfKeys;
 	private int numOfChilds;
 	private Boolean isLeaf;
-	private List<K> keys = null;
-	private List<V> values = null;
-	private List<IBTreeNode<K, V>> children = null;
+	private List<K> keys = new ArrayList<K>();
+	private List<V> values = new ArrayList<V>();;
+	private List<IBTreeNode<K, V>> children = new ArrayList<IBTreeNode<K,V>>();
 
 	
 	public BTreeNode(int numOfChilds) {
@@ -34,7 +35,7 @@ public class BTreeNode<K extends Comparable<K>, V> implements IBTreeNode<K, V> {
 	@Override
 	public boolean isLeaf() {
 		// TODO Auto-generated method stub
-		return isLeaf;
+		return this.isLeaf;
 	}
 
 	@Override
