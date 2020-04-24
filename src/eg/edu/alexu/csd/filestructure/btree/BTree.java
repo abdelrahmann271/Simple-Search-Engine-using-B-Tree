@@ -8,8 +8,10 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 	
 	private int degree;
 	private int maxKeys;
+	private int minKeys;
 	private IBTreeNode<K, V> root = null;
 	private IBTreeNode<K, V> NodeToInsertIn = null;
+	private IBTreeNode<K, V> NodeToSearchIn = null;
 	private Vector<IBTreeNode<K, V>> parents = new Vector<>();
 	
 	public BTree(int degree) {
@@ -17,6 +19,7 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 		this.degree = degree;
 		root = new BTreeNode<K,V>(degree);
 		this.maxKeys = degree-1;
+		this.minKeys = (int) (Math.ceil((double)degree/2)-1);
 	}
 	
 	@Override
@@ -211,9 +214,13 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 	private void searchForInsert(IBTreeNode<K, V> node , K key )  {
 		if(node.getKeys().size() == 0) {	//Insert at root.
 			NodeToInsertIn = this.root;
+			
 		}
 		for(int i = 0 ; i < node.getKeys().size() ; i++) {
 			//Continue searching into left.
+			if(node.getKeys().get(i).compareTo(key) == 0) {
+				NodeToSearchIn = node;
+			}
 			if(node.isLeaf() == false  && node.getKeys().get(i).compareTo(key) > 0) {
 				
 				//currentParent = node;
@@ -248,6 +255,18 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 	@Override
 	public V search(K key) {
 		// TODO Auto-generated method stub
+		NodeToSearchIn = null;
+		searchForInsert(this.root, key);
+		if(NodeToSearchIn == null) {
+			return null;
+		}
+		for(int i = 0 ; i < NodeToSearchIn.getKeys().size() ; i++) {
+			if(NodeToSearchIn.getKeys().get(i).compareTo(key) == 0) {
+				parents.clear();
+				return NodeToSearchIn.getValues().get(i);
+			}
+		}
+		parents.clear();
 		return null;
 	}
 
