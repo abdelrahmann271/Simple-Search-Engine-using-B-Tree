@@ -43,8 +43,14 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 			
 			if( NodeToInsertIn.getKeys().get(i).compareTo(NodeToInsertIn.getKeys().get(i-1)) < 0 ) {
 				
-				swapKeys(  NodeToInsertIn.getKeys().get(i) , NodeToInsertIn.getKeys().get(i-1)  );
-				swapValues(   NodeToInsertIn.getValues().get(i) , NodeToInsertIn.getValues().get(i-1) );
+				K temp =  NodeToInsertIn.getKeys().get(i);
+				NodeToInsertIn.getKeys().set(i,  NodeToInsertIn.getKeys().get(i-1));
+				NodeToInsertIn.getKeys().set(i-1, temp);
+				
+				V temp2 =  NodeToInsertIn.getValues().get(i);
+				NodeToInsertIn.getValues().set(i,  NodeToInsertIn.getValues().get(i-1));
+				NodeToInsertIn.getValues().set(i-1, temp2);
+				
 			}
 			else {
 				break;
@@ -118,8 +124,13 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 			
 			if( currentParent.getKeys().get(i).compareTo(currentParent.getKeys().get(i-1)) < 0 ) {
 				
-				swapKeys( currentParent.getKeys().get(i) , currentParent.getKeys().get(i-1)  );
-				swapValues(   currentParent.getValues().get(i) , currentParent.getValues().get(i-1) );
+				K temp =  currentParent.getKeys().get(i);
+				currentParent.getKeys().set(i,  currentParent.getKeys().get(i-1));
+				currentParent.getKeys().set(i-1, temp);
+				
+				V temp2 =  currentParent.getValues().get(i);
+				currentParent.getValues().set(i,  currentParent.getValues().get(i-1));
+				currentParent.getValues().set(i-1, temp2);
 			}
 			else {
 				break;
@@ -178,8 +189,8 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 			IBTreeNode<K, V> leftNode = new BTreeNode<>(degree);
 			IBTreeNode<K, V> rightNode = new BTreeNode<>(degree);
 			
-			leftNode.setLeaf(true);
-			rightNode.setLeaf(true);
+			leftNode.setLeaf(false);
+			rightNode.setLeaf(false);
 			
 			leftNode.setKeys(leftKeys);
 			leftNode.setValues(leftValues);
@@ -208,6 +219,7 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 				//currentParent = node;
 				parents.add(node);
 				searchForInsert(node.getChildren().get(i), key);
+				return;
 				
 			}//Continue searching into right.
 			else if ( node.isLeaf() == false && i == node.getKeys().size()-1 && node.getKeys().get(i).compareTo(key) < 0 ) {
@@ -215,6 +227,7 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 				//currentParent = node;
 				parents.add(node);
 				searchForInsert(node.getChildren().get(i+1), key);
+				return;
 				
 			}//Key will be inserted in this node, Insert instead of this key and fix-up if necessary.
 			else if (node.isLeaf() == true && node.getKeys().get(i).compareTo(key) > 0 ) {
@@ -244,16 +257,6 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 		return false;
 	}
 	
-	private void swapValues (V x , V y) {
-		V temp = x;
-		x = y;
-		y = temp;
-	}
-	
-	private void swapKeys (K x , K y) {
-		K temp = x;
-		x = y;
-		y = temp;
-	}
+
 
 }
