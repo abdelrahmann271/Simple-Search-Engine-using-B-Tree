@@ -98,6 +98,8 @@ public class Test {
 		tree.insert(1, 1);
 		tree.insert(13, 13);
 		System.out.println(tree.search(21));
+		System.out.println(tree.search(50));
+		tree.insert(13, 13);
 		tree.insert(2, 2);
 		tree.insert(7, 7);
 		tree.insert(10, 10);
@@ -105,10 +107,10 @@ public class Test {
 		tree.insert(4, 4);
 		tree.insert(8, 8);
 		
-		System.out.println(tree.search(9));
-		System.out.println(tree.search(12));
-		System.out.println(tree.search(90));
-		System.out.println(tree.search(5));
+//		System.out.println(tree.search(9));
+//		System.out.println(tree.search(12));
+//		System.out.println(tree.search(90));
+//		System.out.println(tree.search(5));
 		//root
 		for(int i = 0 ; i < tree.getRoot().getKeys().size() ; i++ ) {
 			System.out.print(tree.getRoot().getKeys().get(i)+" ");

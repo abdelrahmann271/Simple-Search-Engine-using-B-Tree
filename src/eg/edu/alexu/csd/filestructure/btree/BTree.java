@@ -1,6 +1,8 @@
 package eg.edu.alexu.csd.filestructure.btree;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Vector;
 
 
@@ -13,6 +15,9 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 	private IBTreeNode<K, V> NodeToInsertIn = null;
 	private IBTreeNode<K, V> NodeToSearchIn = null;
 	private Vector<IBTreeNode<K, V>> parents = new Vector<>();
+	private Boolean keyFound = false; //This value is used when we insert an existed key, so if we found it we set it to true in order to not to insert it in the insert function
+									 //it's important to reset this value.
+	private Vector<Integer> NodeAsAchildIndx = new Vector<Integer>();
 	
 	public BTree(int degree) {
 		// TODO Auto-generated constructor stub
@@ -37,7 +42,12 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 	@Override
 	public void insert(K key, V value) {
 		// TODO Auto-generated method stub
+		keyFound = false;
 		searchForInsert(this.root, key);
+		if(keyFound == true) {
+			keyFound = false;
+			return;
+		}
 		NodeToInsertIn.getKeys().add(key);
 		NodeToInsertIn.getValues().add(value);
 		
@@ -213,18 +223,20 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 	
 	private void searchForInsert(IBTreeNode<K, V> node , K key )  {
 		if(node.getKeys().size() == 0) {	//Insert at root.
-			NodeToInsertIn = this.root;
-			
+			NodeToInsertIn = this.root;		
 		}
 		for(int i = 0 ; i < node.getKeys().size() ; i++) {
 			//Continue searching into left.
 			if(node.getKeys().get(i).compareTo(key) == 0) {
 				NodeToSearchIn = node;
+				keyFound = true;
+				return;
 			}
 			if(node.isLeaf() == false  && node.getKeys().get(i).compareTo(key) > 0) {
 				
 				//currentParent = node;
 				parents.add(node);
+				NodeAsAchildIndx.add(i);
 				searchForInsert(node.getChildren().get(i), key);
 				return;
 				
@@ -233,6 +245,7 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 				
 				//currentParent = node;
 				parents.add(node);
+				NodeAsAchildIndx.add(i+1);
 				searchForInsert(node.getChildren().get(i+1), key);
 				return;
 				
@@ -269,13 +282,189 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 		parents.clear();
 		return null;
 	}
+	
+	
+	private void fix_delete() {
+		
+	}
 
 	@Override
 	public boolean delete(K key) {
 		// TODO Auto-generated method stub
-		return false;
+		keyFound = false;
+		searchForInsert(this.root, key);
+		if(keyFound == true) {
+			keyFound = false;
+			return false;
+		}
+		
+		//Case 1 : Contains more than min number of keys and it's a leaf node.
+		//Delete it.
+		if(NodeToSearchIn.isLeaf() == true) {
+			
+			IBTreeNode<K, V> currentParent = parents.get( parents.size()-1 );
+			int indx = NodeAsAchildIndx.get( NodeAsAchildIndx.size()-1 );
+			
+			if(NodeToSearchIn.getKeys().size() > minKeys) {
+				int index = 0;
+				//Get the index.
+				for(int i = 0 ; i < NodeToSearchIn.getKeys().size() ; i++) {
+					if(NodeToSearchIn.getKeys().get(i).compareTo(key) == 0) {
+						index = i;
+						break;
+					}
+				}
+				NodeToSearchIn.getKeys().remove(index);
+				NodeToSearchIn.getValues().remove(index);
+			}
+			//Case 2 : Contains min number of keys and it's a leaf node.
+			else {
+				
+
+				//Try to borrow from left.
+				if( indx-1 >= 0 && currentParent.getChildren().get(indx-1).getKeys().size() > minKeys ) {
+					
+					int indexLast = currentParent.getChildren().get(indx-1).getKeys().size()-1;
+					
+					K lastKey =  currentParent.getChildren().get(indx-1).getKeys().get(indexLast);
+					V lastValue =  currentParent.getChildren().get(indx-1).getValues().get(indexLast);
+					
+					currentParent.getChildren().get(indx-1).getKeys().remove(indexLast);
+					currentParent.getChildren().get(indx-1).getValues().remove(indexLast);
+					
+					K parentKey = currentParent.getKeys().get(indx-1);
+					V parentValue = currentParent.getValues().get(indx-1);
+					
+					currentParent.getKeys().set(indx-1, lastKey);
+					currentParent.getValues().set(indx-1, lastValue);
+					
+					//remove the key
+					for(int i = 0 ; i < NodeToSearchIn.getKeys().size() ; i++) {
+						if(NodeToSearchIn.getKeys().get(i).compareTo(key) == 0) {
+							NodeToSearchIn.getKeys().remove(i);
+							NodeToSearchIn.getValues().remove(i);
+						}
+					}
+					
+					//insert parent.
+					NodeToSearchIn.getKeys().add(parentKey);
+					NodeToSearchIn.getValues().add(parentValue);
+					
+					//adjust its place.
+					for(int i = NodeToSearchIn.getKeys().size()-1 ; i > 0 ; i--) {
+						if( NodeToSearchIn.getKeys().get(i).compareTo(NodeToSearchIn.getKeys().get(i-1)) < 0 ) {
+							K temp =  NodeToSearchIn.getKeys().get(i);
+							NodeToSearchIn.getKeys().set(i,  NodeToSearchIn.getKeys().get(i-1));
+							NodeToSearchIn.getKeys().set(i-1, temp);
+							V temp2 =  NodeToSearchIn.getValues().get(i);
+							NodeToSearchIn.getValues().set(i, NodeToSearchIn.getValues().get(i-1));
+							NodeToSearchIn.getValues().set(i-1, temp2);
+						}
+						else {
+							break;
+						}
+						
+					}
+				}
+				//Try to borrow from right.
+				else if( indx+1 <  currentParent.getChildren().size() && currentParent.getChildren().get(indx+1).getKeys().size() > minKeys ) {
+					
+
+					//Try to borrow from left.
+					if( indx+1 != 0 && currentParent.getChildren().get(indx+1).getKeys().size() > minKeys ) {
+						
+						
+						K FirstKey =  currentParent.getChildren().get(indx-1).getKeys().get(0);
+						V FirstValue =  currentParent.getChildren().get(indx-1).getValues().get(0);
+						
+						currentParent.getChildren().get(indx-1).getKeys().remove(0);
+						currentParent.getChildren().get(indx-1).getValues().remove(0);
+						
+						K parentKey = currentParent.getKeys().get(indx);
+						V parentValue = currentParent.getValues().get(indx);
+						
+						currentParent.getKeys().set(indx, FirstKey);
+						currentParent.getValues().set(indx, FirstValue);
+						
+						//remove the key
+						for(int i = 0 ; i < NodeToSearchIn.getKeys().size() ; i++) {
+							if(NodeToSearchIn.getKeys().get(i).compareTo(key) == 0) {
+								NodeToSearchIn.getKeys().remove(i);
+								NodeToSearchIn.getValues().remove(i);
+							}
+						}
+						
+						//insert parent.
+						NodeToSearchIn.getKeys().add(parentKey);
+						NodeToSearchIn.getValues().add(parentValue);
+						
+						//adjust its place.
+						for(int i = NodeToSearchIn.getKeys().size()-1 ; i > 0 ; i--) {
+							if( NodeToSearchIn.getKeys().get(i).compareTo(NodeToSearchIn.getKeys().get(i-1)) < 0 ) {
+								K temp =  NodeToSearchIn.getKeys().get(i);
+								NodeToSearchIn.getKeys().set(i,  NodeToSearchIn.getKeys().get(i-1));
+								NodeToSearchIn.getKeys().set(i-1, temp);
+								V temp2 =  NodeToSearchIn.getValues().get(i);
+								NodeToSearchIn.getValues().set(i, NodeToSearchIn.getValues().get(i-1));
+								NodeToSearchIn.getValues().set(i-1, temp2);
+							}
+							else {
+								break;
+							}
+						}
+				}
+					
+				}
+				//Merge. The default is merging with left if it exists. else ..> Merge with right.
+				else {
+					//Merge with left.
+					if(indx-1 >= 0) {
+						IBTreeNode<K, V> mergedNode = new BTreeNode<K, V>(this.degree);
+						List<K> mergedKeys = new ArrayList<K>();
+						List<V> mergedValues = new ArrayList<V>();;
+						
+						//Merge two nodes with the exception of the desired one to be deleted and add the parent
+						for(int i = 0 ; i < currentParent.getChildren().get(indx-1).getKeys().size();i++) {
+							
+						
+								mergedKeys.add(currentParent.getChildren().get(indx-1).getKeys().get(i));
+								mergedValues.add(currentParent.getChildren().get(indx-1).getValues().get(i));
+
+
+						}
+						//add what is at the parent then delete it.
+						mergedKeys.add(currentParent.getKeys().get(indx-1));
+						mergedValues.add(currentParent.getValues().get(indx-1));
+						
+						currentParent.getKeys().remove(indx-1);
+						currentParent.getValues().remove(indx-1);
+						currentParent.getChildren().remove(indx-1);
+						
+						
+						for(int i = 0 ; i < currentParent.getChildren().get(indx).getKeys().size();i++) {
+							
+							if(currentParent.getChildren().get(indx-1).getKeys().get(i).compareTo(key) != 0) {
+							mergedKeys.add(currentParent.getChildren().get(indx).getKeys().get(i));
+							mergedValues.add(currentParent.getChildren().get(indx).getValues().get(i));
+							}
+						}
+						
+						mergedNode.setKeys(mergedKeys);
+						mergedNode.setValues(mergedValues);
+						mergedNode.setLeaf(true);
+						
+						currentParent.getChildren().set(indx-1, mergedNode );
+						
+					}
+					//Merge with right.
+					else {
+						
+					}
+				}
+			}			
+		}
+		//Case it'not not leaf node.	
+		return true;
+		
 	}
-	
-
-
 }
