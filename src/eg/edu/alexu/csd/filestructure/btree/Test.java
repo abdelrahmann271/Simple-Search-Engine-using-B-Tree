@@ -97,8 +97,8 @@ public class Test {
 		tree.insert(9, 9);
 		tree.insert(1, 1);
 		tree.insert(13, 13);
-		System.out.println(tree.search(21));
-		System.out.println(tree.search(50));
+//		System.out.println(tree.search(21));
+//		System.out.println(tree.search(50));
 		tree.insert(13, 13);
 		tree.insert(2, 2);
 		tree.insert(7, 7);
@@ -106,7 +106,14 @@ public class Test {
 		tree.insert(12, 12);
 		tree.insert(4, 4);
 		tree.insert(8, 8);
+		tree.insert(30, 30);
+		tree.insert(15, 15);
 		
+//		tree.delete(10);
+//		tree.delete(9);
+		
+//		tree.delete(4);
+//		tree.delete(3);
 //		System.out.println(tree.search(9));
 //		System.out.println(tree.search(12));
 //		System.out.println(tree.search(90));
@@ -156,6 +163,12 @@ public class Test {
 		
 		for(int i = 0 ; i < tree.getRoot().getChildren().get(1).getChildren().get(2).getKeys().size() ; i++ ) {
 			System.out.print(tree.getRoot().getChildren().get(1).getChildren().get(2).getKeys().get(i)+" ");
+		}
+		System.out.println();
+		System.out.println();
+		
+		for(int i = 0 ; i < tree.getRoot().getChildren().get(1).getChildren().get(3).getKeys().size() ; i++ ) {
+			System.out.print(tree.getRoot().getChildren().get(1).getChildren().get(3).getKeys().get(i)+" ");
 		}
 		System.out.println();
 		System.out.println();
