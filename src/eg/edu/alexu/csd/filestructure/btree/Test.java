@@ -2,10 +2,11 @@ package eg.edu.alexu.csd.filestructure.btree;
 
 import java.awt.List;
 import java.util.ArrayList;
+import java.util.Vector;
 
-public class Test {
+public class Test  {
 	public static void main(String[] args) {
-		
+		Vector <IBTreeNode> V=new Vector<IBTreeNode>();
 //		int m = 3;
 //		System.out.println((int)Math.ceil((double)m/2)-1);
 		
@@ -108,9 +109,24 @@ public class Test {
 		tree.insert(8, 8);
 		tree.insert(30, 30);
 		tree.insert(15, 15);
-		
+		tree.delete(12);
+		System.out.println(tree.search(15));
+		//tree.delete(5);
+		V.add(tree.getRoot());
+		System.out.println(tree.getRoot().getKeys());
+		while(!V.isEmpty()) {
+			IBTreeNode temp=V.firstElement();
+			V.remove(0);
+			int n=temp.getChildren().size();
+			for(int i=0;i<n;i++) {
+				V.add((IBTreeNode)temp.getChildren().get(i));
+				System.out.print(((IBTreeNode)temp.getChildren().get(i)).getKeys());
+			}
+			if(n!=0) {
+			System.out.println();}
+		}
 //		tree.delete(10);
-//		tree.delete(9);
+//		tree.delete(5);
 		
 //		tree.delete(4);
 //		tree.delete(3);
@@ -119,7 +135,7 @@ public class Test {
 //		System.out.println(tree.search(90));
 //		System.out.println(tree.search(5));
 		//root
-		for(int i = 0 ; i < tree.getRoot().getKeys().size() ; i++ ) {
+	/*	for(int i = 0 ; i < tree.getRoot().getKeys().size() ; i++ ) {
 			System.out.print(tree.getRoot().getKeys().get(i)+" ");
 		}
 		System.out.println();
@@ -171,7 +187,7 @@ public class Test {
 			System.out.print(tree.getRoot().getChildren().get(1).getChildren().get(3).getKeys().get(i)+" ");
 		}
 		System.out.println();
-		System.out.println();
+		System.out.println();*/
 		
 
 		

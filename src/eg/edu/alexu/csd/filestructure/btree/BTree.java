@@ -500,7 +500,7 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 				}
 			}
 			//replace with predecessor or successor.
-			IBTreeNode<K, V> pre = NodeToSearchIn;
+			IBTreeNode<K, V> pre = NodeToSearchIn.getChildren().get(index);
 			while(pre.isLeaf() == false ) {
 				int lastIndex = pre.getChildren().size()-1;
 				pre = pre.getChildren().get( lastIndex );
@@ -515,7 +515,7 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 				return true;
 			}
 			
-			IBTreeNode<K, V> succ = NodeToSearchIn;
+			IBTreeNode<K, V> succ = NodeToSearchIn.getChildren().get(index+1);
 			while(succ.isLeaf() == false ) {
 				int lastIndex = succ.getChildren().size()-1;
 				succ  = succ.getChildren().get( lastIndex );
@@ -546,10 +546,15 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 				mergedValues.add(succ.getValues().get(i));
 			}
 			
+			mergedNode.setKeys(mergedKeys);
+			mergedNode.setValues(mergedValues);
+			mergedNode.setLeaf(true);
+			
 			NodeToSearchIn.getKeys().remove(index);
 			NodeToSearchIn.getValues().remove(index);
-			NodeToSearchIn.getChildren().set(index-1, mergedNode);
 			NodeToSearchIn.getChildren().remove(index);
+			NodeToSearchIn.getChildren().set(index, mergedNode);
+			
 			
 			//check for the node of underflow
 			if(NodeToSearchIn.getKeys().size() < minKeys) {
