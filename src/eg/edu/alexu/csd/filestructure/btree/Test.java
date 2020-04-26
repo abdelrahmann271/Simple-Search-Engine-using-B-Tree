@@ -1,7 +1,9 @@
 package eg.edu.alexu.csd.filestructure.btree;
 
-import java.awt.List;
+
+import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Vector;
 
 public class Test  {
@@ -90,41 +92,98 @@ public class Test  {
 		//Test 2 : Insert
 		//5,3,21,9,1,13,2,7,10,12,4,8
 		
-		BTree<Integer, Integer> tree = new BTree<Integer, Integer>(4);
+//		BTree<Integer, Integer> tree = new BTree<Integer, Integer>(4);
+		BTree<Integer,String> tree = new BTree<>(3);
 		
-		tree.insert(5, 5);
-		tree.insert(3, 3);
-		tree.insert(21, 21);
-		tree.insert(9, 9);
-		tree.insert(1, 1);
-		tree.insert(13, 13);
-//		System.out.println(tree.search(21));
-//		System.out.println(tree.search(50));
-		tree.insert(13, 13);
-		tree.insert(2, 2);
-		tree.insert(7, 7);
-		tree.insert(10, 10);
-		tree.insert(12, 12);
-		tree.insert(4, 4);
-		tree.insert(8, 8);
-		tree.insert(30, 30);
-		tree.insert(15, 15);
-		tree.delete(12);
-		System.out.println(tree.search(15));
-		//tree.delete(5);
-		V.add(tree.getRoot());
-		System.out.println(tree.getRoot().getKeys());
-		while(!V.isEmpty()) {
-			IBTreeNode temp=V.firstElement();
-			V.remove(0);
-			int n=temp.getChildren().size();
-			for(int i=0;i<n;i++) {
-				V.add((IBTreeNode)temp.getChildren().get(i));
-				System.out.print(((IBTreeNode)temp.getChildren().get(i)).getKeys());
+//		tree.insert(5, 5);
+//		tree.insert(3, 3);
+//		tree.insert(21, 21);
+//		tree.insert(9, 9);
+//		tree.insert(1, 1);
+//		tree.insert(13, 13);
+////		System.out.println(tree.search(21));
+////		System.out.println(tree.search(50));
+//		tree.insert(13, 13);
+//		tree.insert(2, 2);
+//		tree.insert(7, 7);
+//		tree.insert(10, 10);
+//		tree.insert(12, 12);
+//		tree.insert(4, 4);
+//		tree.insert(8, 8);
+//		tree.insert(30, 30);
+//		tree.insert(15, 15);
+//		tree.delete(9);
+//		tree.delete(2);
+//		tree.delete(5);
+////		tree.delete(12);
+//		System.out.println(tree.search(15));
+//		//tree.delete(5);
+		
+		//List<Integer> inp = Arrays.asList(new Integer[]{1, 3, 7, 10, 11, 13, 14, 15, 18, 16, 19, 24, 25, 26, 21, 4, 5, 20, 22, 2, 17, 12, 6});
+		List<Integer> inp = Arrays.asList(new Integer[]{1, 3, 7, 10, 11, 13});
+		for (int i : inp)
+			tree.insert(i, "Soso" + i);
+		
+		
+		try {
+			V.add(tree.getRoot());
+			System.out.println(tree.getRoot().getKeys());
+			while(!V.isEmpty()) {
+				IBTreeNode temp=V.firstElement();
+				V.remove(0);
+				int n=temp.getChildren().size();
+				for(int i=0;i<n;i++) {
+					V.add((IBTreeNode)temp.getChildren().get(i));
+					System.out.print(((IBTreeNode)temp.getChildren().get(i)).getKeys());
+				}
+				if(n!=0) {
+				System.out.println();}
 			}
-			if(n!=0) {
-			System.out.println();}
+		} catch (Exception e) {
+			// TODO: handle exception
 		}
+		
+		tree.delete(13);
+
+		try {
+			V.add(tree.getRoot());
+			System.out.println(tree.getRoot().getKeys());
+			while(!V.isEmpty()) {
+				IBTreeNode temp=V.firstElement();
+				V.remove(0);
+				int n=temp.getChildren().size();
+				for(int i=0;i<n;i++) {
+					V.add((IBTreeNode)temp.getChildren().get(i));
+					System.out.print(((IBTreeNode)temp.getChildren().get(i)).getKeys());
+				}
+				if(n!=0) {
+				System.out.println();}
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+
+		
+		tree.delete(1);
+
+		try {
+			V.add(tree.getRoot());
+			System.out.println(tree.getRoot().getKeys());
+			while(!V.isEmpty()) {
+				IBTreeNode temp=V.firstElement();
+				V.remove(0);
+				int n=temp.getChildren().size();
+				for(int i=0;i<n;i++) {
+					V.add((IBTreeNode)temp.getChildren().get(i));
+					System.out.print(((IBTreeNode)temp.getChildren().get(i)).getKeys());
+				}
+				if(n!=0) {
+				System.out.println();}
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
 //		tree.delete(10);
 //		tree.delete(5);
 		
