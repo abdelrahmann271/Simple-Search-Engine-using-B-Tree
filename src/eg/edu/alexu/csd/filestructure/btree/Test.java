@@ -7,246 +7,129 @@ import java.util.Arrays;
 import java.util.Vector;
 
 public class Test  {
+	Vector <IBTreeNode> V=new Vector<IBTreeNode>();
+	
+	public void print(IBTreeNode<Integer, String> node ) {
+	     V.add(node);
+	        System.out.println(node.getKeys());
+	        while(!V.isEmpty()) {
+	            IBTreeNode temp=V.firstElement();
+	            V.remove(0);
+	            int n=temp.getChildren().size();
+	            for(int i=0;i<n;i++) {
+	                V.add((IBTreeNode)temp.getChildren().get(i));
+	                System.out.print(((IBTreeNode)temp.getChildren().get(i)).getKeys());
+	            }
+	            if(n!=0) {
+	            System.out.println();}
+	        }
+	}
+	
 	public static void main(String[] args) {
-		Vector <IBTreeNode> V=new Vector<IBTreeNode>();
-//		int m = 3;
-//		System.out.println((int)Math.ceil((double)m/2)-1);
 		
-//		java.util.List<Integer> s = new ArrayList<Integer>();
-//		s.add(2);
-//		System.out.println(s.size());
+
+		IBTree<Integer, String> tree = new BTree<Integer, String>(3);
+//		List<Integer> inp = Arrays.asList(new Integer[]{1, 3, 7, 10, 11, 13, 14, 15, 18, 16, 19, 24, 25, 26, 21, 4, 5, 20, 22, 2, 17, 12, 6});
+//		for (int i : inp)
+//			tree.insert(i, "Soso" + i);
+//		
+		Test f = new Test();
+//		
+//		f.print(tree.getRoot());
+//		
+//		System.out.println(tree.delete(6) + "6");
+//		f.print(tree.getRoot());
+//		System.out.println(tree.delete(13) +"13");
+//		f.print(tree.getRoot());
+//		System.out.println(tree.delete(7) + "7");
+//		f.print(tree.getRoot());
+//		System.out.println(tree.delete(4) + "4");
+//		f.print(tree.getRoot());
+//		System.out.println(tree.delete(2) + "2");
+//		f.print(tree.getRoot());
+//		System.out.println(tree.delete(16) + "16");
 		
-//		//Test 1 Insert - Passed
-//		BTree<Integer, Integer> tree = new BTree<>(3);
-//		tree.insert(1, 1);
-//		tree.insert(2, 2);
-//		tree.insert(3, 3);
-//		tree.insert(4, 4);
-//		tree.insert(5, 5);
-//		tree.insert(6, 6);
-//		tree.insert(7, 7);
-//		tree.insert(8, 8);
-//		tree.insert(9, 9);
-//		tree.insert(10, 10);
-//
-//		
-//		//root
-//		for(int i = 0 ; i < tree.getRoot().getKeys().size() ; i++ ) {
-//			System.out.print(tree.getRoot().getKeys().get(i)+" ");
-//		}
-//		System.out.println();
-//		System.out.println();
-//		
-//		//left root
-//		for(int i = 0 ; i < tree.getRoot().getChildren().get(0).getKeys().size() ; i++ ) {
-//			System.out.print(tree.getRoot().getChildren().get(0).getKeys().get(i)+" ");
-//		}
-//		System.out.println();
-//		System.out.println();
-//		
-//		//right root
-//		for(int i = 0 ; i < tree.getRoot().getChildren().get(1).getKeys().size() ; i++ ) {
-//			System.out.print(tree.getRoot().getChildren().get(1).getKeys().get(i)+" ");
-//		}
-//		System.out.println();
-//		System.out.println();
-//		
-//
-//		//left left root
-//		for(int i = 0 ; i < tree.getRoot().getChildren().get(0).getChildren().get(0).getKeys().size() ; i++ ) {
-//			System.out.print(tree.getRoot().getChildren().get(0).getChildren().get(0).getKeys().get(i)+" ");
-//		}
-//		System.out.println();
-//		System.out.println();
-//		
-//		//left right root
-//		for(int i = 0 ; i < tree.getRoot().getChildren().get(0).getChildren().get(1).getKeys().size() ; i++ ) {
-//			System.out.print(tree.getRoot().getChildren().get(0).getChildren().get(1).getKeys().get(i)+" ");
-//		}
-//		System.out.println();
-//		System.out.println();
-//		
-//		//right left root
-//		
-//		for(int i = 0 ; i < tree.getRoot().getChildren().get(1).getChildren().get(0).getKeys().size() ; i++ ) {
-//			System.out.print(tree.getRoot().getChildren().get(1).getChildren().get(0).getKeys().get(i)+" ");
-//		}
-//		System.out.println();
-//		System.out.println();
-//		
-//		
-//		//right right root
-//		
-//		for(int i = 0 ; i < tree.getRoot().getChildren().get(1).getChildren().get(1).getKeys().size() ; i++ ) {
-//			System.out.print(tree.getRoot().getChildren().get(1).getChildren().get(1).getKeys().get(i)+" ");
-//		}
-//		System.out.println();
-//		System.out.println();
-//		
-//		for(int i = 0 ; i < tree.getRoot().getChildren().get(1).getChildren().get(2).getKeys().size() ; i++ ) {
-//			System.out.print(tree.getRoot().getChildren().get(1).getChildren().get(2).getKeys().get(i)+" ");
-//		}
-//		System.out.println();
-//		System.out.println();
-		
-		//Test 2 : Insert
-		//5,3,21,9,1,13,2,7,10,12,4,8
-		
-//		BTree<Integer, Integer> tree = new BTree<Integer, Integer>(4);
-		BTree<Integer,String> tree = new BTree<>(3);
-		
-//		tree.insert(5, 5);
-//		tree.insert(3, 3);
-//		tree.insert(21, 21);
-//		tree.insert(9, 9);
-//		tree.insert(1, 1);
-//		tree.insert(13, 13);
-////		System.out.println(tree.search(21));
-////		System.out.println(tree.search(50));
-//		tree.insert(13, 13);
-//		tree.insert(2, 2);
-//		tree.insert(7, 7);
-//		tree.insert(10, 10);
-//		tree.insert(12, 12);
-//		tree.insert(4, 4);
-//		tree.insert(8, 8);
-//		tree.insert(30, 30);
-//		tree.insert(15, 15);
-//		tree.delete(9);
-//		tree.delete(2);
-//		tree.delete(5);
-////		tree.delete(12);
-//		System.out.println(tree.search(15));
-//		//tree.delete(5);
-		
-		//List<Integer> inp = Arrays.asList(new Integer[]{1, 3, 7, 10, 11, 13, 14, 15, 18, 16, 19, 24, 25, 26, 21, 4, 5, 20, 22, 2, 17, 12, 6});
-		List<Integer> inp = Arrays.asList(new Integer[]{1, 3, 7, 10, 11, 13});
+		List<Integer> inp = Arrays.asList(new Integer[]{1, 3, 7, 10, 11, 13, 14, 15, 18, 16, 19, 24, 25, 26, 21, 4, 5, 20, 22, 2, 17, 12, 6});
 		for (int i : inp)
 			tree.insert(i, "Soso" + i);
 		
 		
-		try {
-			V.add(tree.getRoot());
-			System.out.println(tree.getRoot().getKeys());
-			while(!V.isEmpty()) {
-				IBTreeNode temp=V.firstElement();
-				V.remove(0);
-				int n=temp.getChildren().size();
-				for(int i=0;i<n;i++) {
-					V.add((IBTreeNode)temp.getChildren().get(i));
-					System.out.print(((IBTreeNode)temp.getChildren().get(i)).getKeys());
-				}
-				if(n!=0) {
-				System.out.println();}
-			}
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
+		f.print(tree.getRoot());
 		
-		tree.delete(13);
+		System.out.println(tree.delete(25) + "25 ");
+		f.print(tree.getRoot());
+		System.out.println(tree.delete(13) + "13 ");
+		f.print(tree.getRoot());
+		System.out.println(tree.delete(12) + "12 ");
+		f.print(tree.getRoot());
+		System.out.println(tree.delete(15) + "15 ");
+		f.print(tree.getRoot());
+		System.out.println(tree.delete(19) + "19 ");
+		f.print(tree.getRoot());
+		System.out.println(tree.delete(26) + "26 ");
+		f.print(tree.getRoot());
+		System.out.println(tree.delete(17) + "17 ");
+		f.print(tree.getRoot());
+		System.out.println(tree.delete(21) + "21 ");
+		f.print(tree.getRoot());
+		System.out.println(tree.delete(14) + "14 ");
+		f.print(tree.getRoot());
+		System.out.println(tree.delete(18) + "18 ");
+		f.print(tree.getRoot());
+		System.out.println(tree.delete(4) + "4 ");
+		f.print(tree.getRoot());
+		System.out.println(tree.delete(1) + "1 ");
+		f.print(tree.getRoot());
+		System.out.println(tree.delete(3) + "3 ");
+		f.print(tree.getRoot());
+		System.out.println(tree.delete(20) + "20 ");
+		f.print(tree.getRoot());
+		System.out.println(tree.delete(7) + "7");
+		f.print(tree.getRoot());
+		System.out.println(tree.delete(16) + "16 ");
+		f.print(tree.getRoot());
+		System.out.println(tree.delete(5) + "5 ");
+		f.print(tree.getRoot());
+		System.out.println(tree.delete(10) + "10 ");
+		f.print(tree.getRoot());
+		System.out.println(tree.delete(11) + "11 ");
+		f.print(tree.getRoot());
+		System.out.println(tree.delete(6) + "6 ");
+		f.print(tree.getRoot());
 
-		try {
-			V.add(tree.getRoot());
-			System.out.println(tree.getRoot().getKeys());
-			while(!V.isEmpty()) {
-				IBTreeNode temp=V.firstElement();
-				V.remove(0);
-				int n=temp.getChildren().size();
-				for(int i=0;i<n;i++) {
-					V.add((IBTreeNode)temp.getChildren().get(i));
-					System.out.print(((IBTreeNode)temp.getChildren().get(i)).getKeys());
-				}
-				if(n!=0) {
-				System.out.println();}
-			}
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
+//		25
+//		13
+//		12
+//		15
+//		19
+//		26
+//		17
+//		21
+//		14
+//		18
+//		4
+//		1
+//		3
+//		20
+//		7
+//		16
+//		5
+//		10
+//		11
+//		6
+		
+		
 
 		
-		tree.delete(1);
+		
+		
 
-		try {
-			V.add(tree.getRoot());
-			System.out.println(tree.getRoot().getKeys());
-			while(!V.isEmpty()) {
-				IBTreeNode temp=V.firstElement();
-				V.remove(0);
-				int n=temp.getChildren().size();
-				for(int i=0;i<n;i++) {
-					V.add((IBTreeNode)temp.getChildren().get(i));
-					System.out.print(((IBTreeNode)temp.getChildren().get(i)).getKeys());
-				}
-				if(n!=0) {
-				System.out.println();}
-			}
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
+	        
+
 		
-//		tree.delete(10);
-//		tree.delete(5);
 		
-//		tree.delete(4);
-//		tree.delete(3);
-//		System.out.println(tree.search(9));
-//		System.out.println(tree.search(12));
-//		System.out.println(tree.search(90));
-//		System.out.println(tree.search(5));
-		//root
-	/*	for(int i = 0 ; i < tree.getRoot().getKeys().size() ; i++ ) {
-			System.out.print(tree.getRoot().getKeys().get(i)+" ");
-		}
-		System.out.println();
-		System.out.println();
 		
-		for(int i = 0 ; i < tree.getRoot().getChildren().get(0).getKeys().size() ; i++ ) {
-			System.out.print(tree.getRoot().getChildren().get(0).getKeys().get(i)+" ");
-		}
-		System.out.println();
-		System.out.println();
-		
-		for(int i = 0 ; i < tree.getRoot().getChildren().get(1).getKeys().size() ; i++ ) {
-			System.out.print(tree.getRoot().getChildren().get(1).getKeys().get(i)+" ");
-		}
-		System.out.println();
-		System.out.println();
-		
-		for(int i = 0 ; i < tree.getRoot().getChildren().get(0).getChildren().get(0).getKeys().size() ; i++ ) {
-			System.out.print(tree.getRoot().getChildren().get(0).getChildren().get(0).getKeys().get(i)+" ");
-		}
-		System.out.println();
-		System.out.println();
-		
-		for(int i = 0 ; i < tree.getRoot().getChildren().get(0).getChildren().get(1).getKeys().size() ; i++ ) {
-			System.out.print(tree.getRoot().getChildren().get(0).getChildren().get(1).getKeys().get(i)+" ");
-		}
-		System.out.println();
-		System.out.println();
-		
-		for(int i = 0 ; i < tree.getRoot().getChildren().get(1).getChildren().get(0).getKeys().size() ; i++ ) {
-			System.out.print(tree.getRoot().getChildren().get(1).getChildren().get(0).getKeys().get(i)+" ");
-		}
-		System.out.println();
-		System.out.println();
-		
-		for(int i = 0 ; i < tree.getRoot().getChildren().get(1).getChildren().get(1).getKeys().size() ; i++ ) {
-			System.out.print(tree.getRoot().getChildren().get(1).getChildren().get(1).getKeys().get(i)+" ");
-		}
-		System.out.println();
-		System.out.println();
-		
-		for(int i = 0 ; i < tree.getRoot().getChildren().get(1).getChildren().get(2).getKeys().size() ; i++ ) {
-			System.out.print(tree.getRoot().getChildren().get(1).getChildren().get(2).getKeys().get(i)+" ");
-		}
-		System.out.println();
-		System.out.println();
-		
-		for(int i = 0 ; i < tree.getRoot().getChildren().get(1).getChildren().get(3).getKeys().size() ; i++ ) {
-			System.out.print(tree.getRoot().getChildren().get(1).getChildren().get(3).getKeys().get(i)+" ");
-		}
-		System.out.println();
-		System.out.println();*/
+
 		
 
 		
