@@ -21,7 +21,7 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 	private Boolean keyFound = false; //This value is used when we insert an existed key, so if we found it we set it to true in order to not to insert it in the insert function
 									 //it's important to reset this value.
 	private Vector<Integer> NodeAsAchildIndx = new Vector<Integer>();
-	
+	int c =0;
 	public BTree(int mindegree) {
 
 		if(mindegree < 2) {
@@ -31,9 +31,7 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 		// TODO Auto-generated constructor stub
 		this.mindegree = mindegree;
 		this.maxdegree = 2*mindegree;
-		//root = new BTreeNode<K,V>(degree);
 		this.maxKeys = maxdegree-1;
-		//this.minKeys = (int) (Math.ceil((double)degree/2)-1);
 		this.minKeys = mindegree-1;
 	}
 	
@@ -95,11 +93,8 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 		int size = NodeToInsertIn.getKeys().size();
 		if( size  > maxKeys) {
 			int median = ( size) / 2 ;
-
-			
 			K medianKey = NodeToInsertIn.getKeys().get(median);
-			V medianValue = NodeToInsertIn.getValues().get(median);
-			
+			V medianValue = NodeToInsertIn.getValues().get(median);			
 			List<K> leftKeys = new ArrayList<K>();
 			List<V> leftValues = new ArrayList<V>();
 			List<K> rightKeys = new ArrayList<K>();
@@ -113,24 +108,17 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 				rightKeys.add(NodeToInsertIn.getKeys().get(k));
 				rightValues.add(NodeToInsertIn.getValues().get(k));
 			}
-			
 			IBTreeNode<K, V> leftNode = new BTreeNode<>(mindegree);
 			IBTreeNode<K, V> rightNode = new BTreeNode<>(mindegree);
-			
 			leftNode.setLeaf(true);
 			rightNode.setLeaf(true);
-			
 			leftNode.setKeys(leftKeys);
 			leftNode.setValues(leftValues);
 			rightNode.setKeys(rightKeys);
 			rightNode.setValues(rightValues);
-			
 			insert_fixup( medianKey, medianValue, leftNode, rightNode	);
-			
 		}
-		
 		parents.clear();
-		
 	}
 	
 	
@@ -149,20 +137,15 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 			currentParent = parents.get(parents.size()-1);
 			parents.remove(parents.size()-1);
 		}
-		
-
-		
 		currentParent.getKeys().add(key);
 		currentParent.getValues().add(value);
 		int i;
 		for( i = currentParent.getKeys().size()-1 ; i > 0 ; i--) {
 			
 			if( currentParent.getKeys().get(i).compareTo(currentParent.getKeys().get(i-1)) < 0 ) {
-				
 				K temp =  currentParent.getKeys().get(i);
 				currentParent.getKeys().set(i,  currentParent.getKeys().get(i-1));
 				currentParent.getKeys().set(i-1, temp);
-				
 				V temp2 =  currentParent.getValues().get(i);
 				currentParent.getValues().set(i,  currentParent.getValues().get(i-1));
 				currentParent.getValues().set(i-1, temp2);
@@ -172,9 +155,6 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 			}
 			
 		}
-		//update children.
-		//because we inserted in a not leaf node.
-		//change i child and add the right child at the end and put it to i+1 .
 		if(flag) {
 			currentParent.getChildren().set(i, left);
 			currentParent.getChildren().add(right);
@@ -193,18 +173,15 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 		int size = currentParent.getKeys().size();
 		//Don't forget to insert children at splitting!.
 		if( size  > maxKeys) {
-			int median = ( size ) / 2 ;
-			
+			int median = ( size ) / 2 ;		
 			K medianKey = currentParent.getKeys().get(median);
-			V medianValue = currentParent.getValues().get(median);
-			
+			V medianValue = currentParent.getValues().get(median);		
 			List<K> leftKeys = new ArrayList<K>();
 			List<V> leftValues = new ArrayList<V>();
 			List<K> rightKeys = new ArrayList<K>();
 			List<V> rightValues = new ArrayList<V>();
 			List<IBTreeNode<K, V>> leftChildren = new ArrayList<IBTreeNode<K,V>>();
 			List<IBTreeNode<K, V>> rightChildren = new ArrayList<IBTreeNode<K,V>>();
-			
 			for(int k = 0 ; k < median ; k++) {
 				leftKeys.add(currentParent.getKeys().get(k));
 				leftValues.add(currentParent.getValues().get(k));
@@ -213,34 +190,25 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 				rightKeys.add(currentParent.getKeys().get(k));
 				rightValues.add(currentParent.getValues().get(k));
 			}
-			
 			for(int k = 0 ; k <= median ; k++) {
 				leftChildren.add(currentParent.getChildren().get(k) );
 			}
 			for(int k = median+1 ; k < currentParent.getChildren().size() ; k++) {
 				rightChildren.add(currentParent.getChildren().get(k) );
 			}
-			
 			IBTreeNode<K, V> leftNode = new BTreeNode<>(mindegree);
 			IBTreeNode<K, V> rightNode = new BTreeNode<>(mindegree);
-			
 			leftNode.setLeaf(false);
 			rightNode.setLeaf(false);
-			
 			leftNode.setKeys(leftKeys);
 			leftNode.setValues(leftValues);
 			leftNode.setChildren(leftChildren);
-			
 			rightNode.setKeys(rightKeys);
 			rightNode.setValues(rightValues);
 			rightNode.setChildren(rightChildren);
-			
 			insert_fixup(medianKey, medianValue, leftNode, rightNode);
-			
 		}
-		
 		return;
-		
 	}
 	
 	private void searchForInsert(IBTreeNode<K, V> node , K key )  {
@@ -261,9 +229,9 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 				//currentParent = node;
 				parents.add(node);
 				NodeAsAchildIndx.add(i);
-				if(node.getChildren().get(i) != null) {
+//				if(node.getChildren().get(i) != null) {
 					searchForInsert(node.getChildren().get(i), key);
-				}			
+//				}			
 				return;
 				
 			}//Continue searching into right.
@@ -272,9 +240,9 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 				//currentParent = node;
 				parents.add(node);
 				NodeAsAchildIndx.add(i+1);
-				if(  i+1< node.getChildren().size() && node.getChildren().get(i+1)!= null ) {
+//				if(  i+1< node.getChildren().size() && node.getChildren().get(i+1)!= null ) {
 					searchForInsert(node.getChildren().get(i+1), key);
-				}		
+//				}		
 				return;
 				
 			}//Key will be inserted in this node, Insert instead of this key and fix-up if necessary.
@@ -318,8 +286,6 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 	
 	private void fix_delete(IBTreeNode<K, V> node) {
 		
-		
-//		if(node.isLeaf() == true) {
 			if(node == this.root) {
 				return ;
 			}
@@ -331,10 +297,6 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 			if(NodeAsAchildIndx.size()-1 >=0) {
 				indx = NodeAsAchildIndx.get( NodeAsAchildIndx.size()-1 );
 			}
-		
-				//Try to borrow from left.
-//				System.out.println(indx-1);
-//				System.out.println(currentParent.getChildren().size());
 				if( indx-1 >= 0 && currentParent.getChildren().get(indx-1).getKeys().size() > minKeys ) {
 					
 					int indexLast = currentParent.getChildren().get(indx-1).getKeys().size()-1;
@@ -368,10 +330,6 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 						node.getChildren().set(0, node.getChildren().get( node.getChildren().size()-1));
 						node.getChildren().set(node.getChildren().size()-1, tmp);
 					}
-
-
-					
-					
 					//adjust its place.
 					for(int i = node.getKeys().size()-1 ; i > 0 ; i--) {
 						if( node.getKeys().get(i).compareTo(node.getKeys().get(i-1)) < 0 ) {
@@ -389,38 +347,25 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 					}
 					return;
 				}
-				//Try to borrow from right.
-		
+				//Try to borrow from right.		
 				else if(  currentParent!=null && indx+1 <  currentParent.getChildren().size() && currentParent.getChildren().get(indx+1).getKeys().size() > minKeys ) {
 
 						K FirstKey =  currentParent.getChildren().get(indx+1).getKeys().get(0);
 						V FirstValue =  currentParent.getChildren().get(indx+1).getValues().get(0);
 						IBTreeNode<K, V> child = null;
-//						if( indx-1 >=0 &&  !(currentParent.getChildren().get(indx-1).getChildren() == null || currentParent.getChildren().get(indx-1).getChildren().size()==0)) {
-//							 child = currentParent.getChildren().get(indx-1).getChildren().get(0);
-//						}
-						//indx-1 >=0 && 
 						if(currentParent.getChildren().get(indx+1).isLeaf()==false &&   !(currentParent.getChildren().get(indx+1).getChildren() == null || currentParent.getChildren().get(indx+1).getChildren().size()==0)) {
 							 child = currentParent.getChildren().get(indx+1).getChildren().get(0);
 							 currentParent.getChildren().get(indx+1).getChildren().remove(0);
 						}
-						
-						
 						currentParent.getChildren().get(indx+1).getKeys().remove(0);
 						currentParent.getChildren().get(indx+1).getValues().remove(0);
-						
 						K parentKey = currentParent.getKeys().get(indx);
 						V parentValue = currentParent.getValues().get(indx);
-						
 						currentParent.getKeys().set(indx, FirstKey);
 						currentParent.getValues().set(indx, FirstValue);
-						
 						//insert parent.
 						node.getKeys().add(parentKey);
 						node.getValues().add(parentValue);
-						
-						
-
 						//adjust its place.
 						for(int i = node.getKeys().size()-1 ; i > 0 ; i--) {
 							if( node.getKeys().get(i).compareTo(node.getKeys().get(i-1)) < 0 ) {
@@ -438,7 +383,6 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 						if(currentParent.getChildren().get(indx+1).isLeaf()==false && !(currentParent.getChildren().get(indx+1).getChildren() == null || currentParent.getChildren().get(indx+1).getChildren().size()==0)) {
 							node.getChildren().add(child);
 						}
-						//node.getChildren().add(child);
 						return;
 				}
 				//Merge. The default is merging with left if it exists. else ..> Merge with right.
@@ -448,63 +392,43 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 						IBTreeNode<K, V> mergedNode = new BTreeNode<K, V>(this.mindegree);
 						List<K> mergedKeys = new ArrayList<K>();
 						List<V> mergedValues = new ArrayList<V>();
-						List<IBTreeNode<K, V>> mergedChilds = new ArrayList<>();
-						
+						List<IBTreeNode<K, V>> mergedChilds = new ArrayList<>();					
 						//Merge two nodes with the exception of the desired one to be deleted and add the parent
 						for(int i = 0 ; i < currentParent.getChildren().get(indx-1).getKeys().size();i++) {
 							
 						
 								mergedKeys.add(currentParent.getChildren().get(indx-1).getKeys().get(i));
 								mergedValues.add(currentParent.getChildren().get(indx-1).getValues().get(i));
-
-
 						}
 						if( !(currentParent.getChildren().get(indx-1).getChildren().size() ==0 || currentParent.getChildren().get(indx-1).getChildren() == null ) ) {
 							for(int i = 0 ; i < currentParent.getChildren().get(indx-1).getChildren().size();i++) {
-								
+							
 								mergedChilds.add(currentParent.getChildren().get(indx-1).getChildren().get(i));
 
 							}
 						}
-
-						
 						//add what is at the parent then delete it.
-//						System.out.println(indx-1);
-//						System.out.println(currentParent.getKeys().size());
 						mergedKeys.add(currentParent.getKeys().get(indx-1));
 						mergedValues.add(currentParent.getValues().get(indx-1));
-						
 						currentParent.getKeys().remove(indx-1);
 						currentParent.getValues().remove(indx-1);
-						
-						
-						
 						for(int i = 0 ; i < currentParent.getChildren().get(indx).getKeys().size();i++) {
-							
-
 							mergedKeys.add(currentParent.getChildren().get(indx).getKeys().get(i));
-							mergedValues.add(currentParent.getChildren().get(indx).getValues().get(i));
-							
+							mergedValues.add(currentParent.getChildren().get(indx).getValues().get(i));					
 						}
 						if( !(currentParent.getChildren().get(indx).getChildren().size() ==0  || currentParent.getChildren().get(indx).getChildren() == null) ) {
 							for(int i = 0 ; i < currentParent.getChildren().get(indx).getChildren().size();i++) {
-								
-
-								mergedChilds.add(currentParent.getChildren().get(indx).getChildren().get(i));
-								
+								mergedChilds.add(currentParent.getChildren().get(indx).getChildren().get(i));							
 							}
 						}
-
-						
 						currentParent.getChildren().remove(indx-1);
-						
 						mergedNode.setKeys(mergedKeys);
 						mergedNode.setValues(mergedValues);
 						mergedNode.setChildren(mergedChilds);
-						mergedNode.setLeaf(true);
-						
+						if(node.isLeaf() == false) {
+							mergedNode.setLeaf(false);
+						}
 						currentParent.getChildren().set(indx-1, mergedNode );
-						
 						if(currentParent.getKeys().size() == 0 && currentParent == this.root) {
 							this.root = mergedNode;
 							return;
@@ -513,8 +437,7 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 							parents.remove(parents.size()-1);
 							NodeAsAchildIndx.remove(NodeAsAchildIndx.size()-1);
 							fix_delete(currentParent);
-						}
-						
+						}	
 					}
 					//Merge with right.
 					else {
@@ -524,60 +447,40 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 							List<K> mergedKeys = new ArrayList<K>();
 							List<V> mergedValues = new ArrayList<V>();
 							List<IBTreeNode<K, V>> mergedChilds = new ArrayList<>();
-							
 							//Merge two nodes with the exception of the desired one to be deleted and add the parent
 							for(int i = 0 ; i < currentParent.getChildren().get(indx).getKeys().size();i++) {
-								
-							
 									mergedKeys.add(currentParent.getChildren().get(indx).getKeys().get(i));
 									mergedValues.add(currentParent.getChildren().get(indx).getValues().get(i));
-
-
 							}
-							
 							if( !(currentParent.getChildren().get(indx).getChildren().size() ==0 || currentParent.getChildren().get(indx).getChildren() == null ) ) {
 								for(int i = 0 ; i < currentParent.getChildren().get(indx).getChildren().size();i++) {
 									
-									
+								
 									mergedChilds.add(currentParent.getChildren().get(indx).getChildren().get(i));  
 								}
-							}
-							
-
+							}				
 							//add what is at the parent then delete it.
 							mergedKeys.add(currentParent.getKeys().get(indx));
 							mergedValues.add(currentParent.getValues().get(indx));
-							
 							currentParent.getKeys().remove(indx);
 							currentParent.getValues().remove(indx);
 							currentParent.getChildren().remove(indx);
-							
-							//	for(int i = 0 ; i < currentParent.getChildren().get(indx+1).getKeys().size();i++) {
 							for(int i = 0 ; i < currentParent.getChildren().get(indx).getKeys().size();i++) {
-								
-
-//								mergedKeys.add(currentParent.getChildren().get(indx+1).getKeys().get(i));
-//								mergedValues.add(currentParent.getChildren().get(indx+1).getValues().get(i));
 								mergedKeys.add(currentParent.getChildren().get(indx).getKeys().get(i));
 								mergedValues.add(currentParent.getChildren().get(indx).getValues().get(i));
 							}
-							
-							if( !(currentParent.getChildren().get(indx).getChildren().size() ==0 || currentParent.getChildren().get(indx+1).getChildren() == null ) ) {
+							if( !(currentParent.getChildren().get(indx).getChildren().size() ==0 || currentParent.getChildren().get(indx).getChildren() == null ) ) {
 								for(int i = 0 ; i < currentParent.getChildren().get(indx).getChildren().size();i++) {
-									
 									mergedChilds.add(currentParent.getChildren().get(indx).getChildren().get(i));
-
 								}
 							}
-
-							
 							mergedNode.setKeys(mergedKeys);
 							mergedNode.setValues(mergedValues);
 							mergedNode.setChildren(mergedChilds);
-							mergedNode.setLeaf(true);
-							
+							if(node.isLeaf() == false) {
+								mergedNode.setLeaf(false);
+							}
 							currentParent.getChildren().set(indx, mergedNode );
-							
 							if(currentParent.getKeys().size() == 0 && currentParent == this.root) {
 								this.root = mergedNode;
 								return;
@@ -590,7 +493,6 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 					}
 				}			
 		}
-		//}
 	}
 
 	@Override
@@ -603,9 +505,10 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 		keyFound = false;
 		searchForInsert(this.root, key);
 		if(keyFound == false) {
+			System.out.println(this.search(key));
+			System.out.println(key + "a7ooooo");
 			return false;
 		}
-		
 		//Node is leaf.
 		if(NodeToSearchIn.isLeaf()== true)
 		{
@@ -618,7 +521,6 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 			}
 			NodeToSearchIn.getKeys().remove(index);
 			NodeToSearchIn.getValues().remove(index);
-			
 			if(NodeToSearchIn.getKeys().size() < minKeys) {
 				fix_delete(NodeToSearchIn);
 			}
@@ -635,7 +537,6 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 			}
 			//replace with predecessor or successor.
 			IBTreeNode<K, V> pre = NodeToSearchIn.getChildren().get(index);
-	
 			while(pre.isLeaf() == false ) {
 				int lastIndex = pre.getChildren().size()-1;
 				pre = pre.getChildren().get( lastIndex );
@@ -649,7 +550,6 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 				NodeToSearchIn.getValues().set(index, preValue);
 				return true;
 			}
-			
 			IBTreeNode<K, V> succ = NodeToSearchIn.getChildren().get(index+1);
 			while(succ != null && succ.isLeaf() == false ) {
 				succ  = succ.getChildren().get( 0);
@@ -662,14 +562,12 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 				NodeToSearchIn.getKeys().set(index, preKey);
 				NodeToSearchIn.getValues().set(index, preValue);	
 				return true;
-			}
-			
+			}	
 			//merge then delete element and check for the node if underflow..and also take into consideration merging of children of two nodes.
 			//merge if the pre and succ are the children
 			if(NodeToSearchIn.getChildren().get(0).isLeaf() == true) {
 				
 				IBTreeNode<K, V> mergedNode = new BTreeNode<K,V>(this.mindegree);
-				
 				List<K> mergedKeys = new ArrayList<K>();
 				List<V> mergedValues = new ArrayList<V>();
 				
@@ -682,17 +580,13 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 					mergedKeys.add(succ.getKeys().get(i));
 					mergedValues.add(succ.getValues().get(i));
 				}
-				
 				mergedNode.setKeys(mergedKeys);
 				mergedNode.setValues(mergedValues);
 				mergedNode.setLeaf(true);
-				
 				NodeToSearchIn.getKeys().remove(index);
 				NodeToSearchIn.getValues().remove(index);
 				NodeToSearchIn.getChildren().set(index, mergedNode);
 				NodeToSearchIn.getChildren().remove(index+1);
-				
-				
 				//check for the node of underflow
 				if(NodeToSearchIn.getKeys().size() == 0 && NodeToSearchIn == this.root) {
 					this.root = mergedNode;
@@ -705,57 +599,25 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 				
 			}
 			else  {
-				
-//				K keyH = pre.getKeys().get( pre.getKeys().size()-1 );
-//				V valueH = pre.getValues().get( pre.getValues().size()-1 );
-//				IBTreeNode<K, V> h = NodeToSearchIn;
-//				this.delete(pre.getKeys().get( pre.getKeys().size()-1 ));
-//				
 				IBTreeNode<K, V> pre2 = NodeToSearchIn.getChildren().get(index);
+				parents.add(NodeToSearchIn);
 				NodeAsAchildIndx.add(index);
 				while(pre2.isLeaf() == false ) {
 					int lastIndex = pre2.getChildren().size()-1;
 					parents.add(pre2);
 					NodeAsAchildIndx.add(lastIndex);				
 					pre2 = pre2.getChildren().get( lastIndex );
-
 				}
 				K keyH = pre.getKeys().get( pre.getKeys().size()-1 );
 				V valueH = pre.getValues().get( pre.getValues().size()-1 );
 				IBTreeNode<K, V> h = NodeToSearchIn;
-				
 				pre2.getKeys().remove( pre2.getKeys().size()-1 );
 				pre2.getValues().remove( pre2.getValues().size()-1 );
-				
-//				if(h.getKeys().size() == 0 || index >= h.getKeys().size()) {
-//					h.getKeys().add(keyH);
-//					h.getValues().add(valueH);
-//				}
-//				else {
-					h.getKeys().set(index, keyH );
-					h.getValues().set(index, valueH );
-				
-//				}
-				
+				h.getKeys().set(index, keyH );
+				h.getValues().set(index, valueH );
 				this.fix_delete(pre2);
-//				if(NodeToSearchIn.getKeys().size() == 0) {
-//					NodeToSearchIn.getKeys().add(keyH);
-//					NodeToSearchIn.getValues().add(valueH);
-//				}
-//				else {
-//					NodeToSearchIn.getKeys().set(index, keyH );
-//					NodeToSearchIn.getValues().set(index, valueH );
-//				}
-				
-
-
-
-				
 				return true;
 			}
-			
 		}
-
-		
 	}
 }

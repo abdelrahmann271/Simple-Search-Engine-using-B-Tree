@@ -23,7 +23,7 @@ import javax.management.RuntimeErrorException;
 
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.Test;import com.sun.source.tree.Tree;
 
 
 public class UnitTest {
@@ -607,7 +607,6 @@ public class UnitTest {
 
 			Collections.shuffle(inp);
 			for (int i : inp) {
-				System.out.println(i);
 				Assert.assertTrue(btree.delete(i));
 				if (btree.getRoot() != null)
 					verifyBTree(btree.getRoot(), 0, getHeight(btree.getRoot()), 3, btree.getRoot());
@@ -631,7 +630,6 @@ public class UnitTest {
 			List<Integer> inp = Arrays.asList(new Integer[]{1, 3, 7, 10, 11, 13, 14, 15, 18, 16, 19, 24, 25, 26, 21, 4, 5, 20, 22, 2, 17, 12, 6});
 			for (int i : inp)
 				btree.insert(i, "Soso" + i);
-			
 
 			Assert.assertTrue(btree.delete(6));
 			Assert.assertTrue(verifyBTree(btree.getRoot(), 0, getHeight(btree.getRoot()), 3, btree.getRoot()));
@@ -644,13 +642,12 @@ public class UnitTest {
 
 			Assert.assertTrue(btree.delete(4));
 			Assert.assertTrue(verifyBTree(btree.getRoot(), 0, getHeight(btree.getRoot()), 3, btree.getRoot()));
-	
+
 			Assert.assertTrue(btree.delete(2));
 			Assert.assertTrue(verifyBTree(btree.getRoot(), 0, getHeight(btree.getRoot()), 3, btree.getRoot()));
 
 			Assert.assertTrue(btree.delete(16));
 			Assert.assertTrue(verifyBTree(btree.getRoot(), 0, getHeight(btree.getRoot()), 3, btree.getRoot()));
-
 
 		} catch (Throwable e) {
 			TestRunner.fail("Fail to delete in tree", e);
@@ -681,13 +678,10 @@ public class UnitTest {
 			traverseTreeInorder(btree.getRoot(), keys, vals);
 			if (keys.size() != set.size())
 				Assert.fail();
-			int c=0;
 			for (Integer i : deleteSet) {
-				System.out.println(btree.delete(i) +" " + c);
-				//Assert.assertTrue(btree.delete(i));
-				System.out.println(btree.search(i) + " " + c);
-				//Assert.assertNull(btree.search(i));
-				c++;
+				Assert.assertTrue(btree.delete(i));
+				System.out.println("assert tre " + i);
+				Assert.assertNull(btree.search(i));
 			}
 			if(!verifyBTree(btree.getRoot(), 0, getHeight(btree.getRoot()), 3, btree.getRoot()))
 				Assert.fail();
