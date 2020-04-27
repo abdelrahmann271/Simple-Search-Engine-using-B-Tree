@@ -333,6 +333,8 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 			}
 		
 				//Try to borrow from left.
+//				System.out.println(indx-1);
+//				System.out.println(currentParent.getChildren().size());
 				if( indx-1 >= 0 && currentParent.getChildren().get(indx-1).getKeys().size() > minKeys ) {
 					
 					int indexLast = currentParent.getChildren().get(indx-1).getKeys().size()-1;
@@ -467,6 +469,8 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 
 						
 						//add what is at the parent then delete it.
+//						System.out.println(indx-1);
+//						System.out.println(currentParent.getKeys().size());
 						mergedKeys.add(currentParent.getKeys().get(indx-1));
 						mergedValues.add(currentParent.getValues().get(indx-1));
 						
@@ -702,11 +706,38 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 			}
 			else  {
 				
+//				K keyH = pre.getKeys().get( pre.getKeys().size()-1 );
+//				V valueH = pre.getValues().get( pre.getValues().size()-1 );
+//				IBTreeNode<K, V> h = NodeToSearchIn;
+//				this.delete(pre.getKeys().get( pre.getKeys().size()-1 ));
+//				
+				IBTreeNode<K, V> pre2 = NodeToSearchIn.getChildren().get(index);
+				NodeAsAchildIndx.add(index);
+				while(pre2.isLeaf() == false ) {
+					int lastIndex = pre2.getChildren().size()-1;
+					parents.add(pre2);
+					NodeAsAchildIndx.add(lastIndex);				
+					pre2 = pre2.getChildren().get( lastIndex );
+
+				}
 				K keyH = pre.getKeys().get( pre.getKeys().size()-1 );
 				V valueH = pre.getValues().get( pre.getValues().size()-1 );
 				IBTreeNode<K, V> h = NodeToSearchIn;
-				this.delete(pre.getKeys().get( pre.getKeys().size()-1 ));
-//
+				
+				pre2.getKeys().remove( pre2.getKeys().size()-1 );
+				pre2.getValues().remove( pre2.getValues().size()-1 );
+				
+//				if(h.getKeys().size() == 0 || index >= h.getKeys().size()) {
+//					h.getKeys().add(keyH);
+//					h.getValues().add(valueH);
+//				}
+//				else {
+					h.getKeys().set(index, keyH );
+					h.getValues().set(index, valueH );
+				
+//				}
+				
+				this.fix_delete(pre2);
 //				if(NodeToSearchIn.getKeys().size() == 0) {
 //					NodeToSearchIn.getKeys().add(keyH);
 //					NodeToSearchIn.getValues().add(valueH);
@@ -717,14 +748,7 @@ public class BTree<K extends Comparable<K>, V> implements IBTree<K, V> {
 //				}
 				
 
-				if(h.getKeys().size() == 0) {
-					h.getKeys().add(keyH);
-					h.getValues().add(valueH);
-				}
-				else {
-					h.getKeys().set(index, keyH );
-					h.getValues().set(index, valueH );
-				}
+
 
 				
 				return true;
