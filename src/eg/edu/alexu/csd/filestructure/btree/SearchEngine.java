@@ -17,15 +17,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class SearchEngine implements ISearchEngine {
-	
-   // private IBTree<String, IBTree<String, List<ISearchResult>>> searchTree;
-	//public IBTree<String, HashSet<ISearchResult>> searchTree;
-	public IBTree<String, List<ISearchResult>> searchTree;
-    private HashSet<String>filePaths ;
+    private IBTree<String, List<ISearchResult>> searchTree;
     private HashSet<String> deletedIDs = new HashSet<>();
-    public SearchEngine() {
-        searchTree = new BTree<>(5);
-        filePaths = new HashSet<>();
+    private HashSet<String> containedIDs = new HashSet<>();
+    private HashSet<String> IndexedWebPage = new HashSet<>();
+    public SearchEngine(int minDeg) {
+        searchTree = new BTree<>(minDeg);
     }
 
     private void indexDoc(Element element) {
@@ -33,6 +30,7 @@ public class SearchEngine implements ISearchEngine {
         Arrays.sort(s);
         Integer frequency = 0;
         String word = "", id = element.getAttribute("id");
+        containedIDs.add(id);
         for (int j = 0; j < s.length; j++) {
             if (word.equals(s[j])) {
                 frequency++;
@@ -40,51 +38,33 @@ public class SearchEngine implements ISearchEngine {
                 word = s[j];
                 frequency = 1;
             } else {
-                addOrUpdateNewWord(word ,id,frequency);
+                addOrUpdateNewWord(word, id, frequency);
                 frequency = 1;
                 word = s[j];
             }
         }
-        if(!word.equals(""))addOrUpdateNewWord(word ,id,frequency);
+        if (!word.equals("")) addOrUpdateNewWord(word, id, frequency);
     }
-   // private void addOrUpdateNewWord(String word , String id , int frequency,IBTree<String, List<ISearchResult>>  tree){
-    private void addOrUpdateNewWord(String word , String id , int frequency){
-    	
-//        System.out.println("Word is : "+ word +" in : " +id +" repeated : "+ frequency + " times");
-        
+    private void addOrUpdateNewWord(String word, String id, int frequency) {
         SearchResult searchResult;
-        searchResult =new SearchResult(id, frequency);
-        
-        List<ISearchResult> results =  this.searchTree.search(word);
-        if(results == null) {
-        	List<ISearchResult> g = new ArrayList<>();
-        	g.add(searchResult);
-        	searchTree.insert(word, g);
+        searchResult = new SearchResult(id, frequency);
+        List<ISearchResult> results = this.searchTree.search(word);
+        if (results == null) {
+            List<ISearchResult> g = new ArrayList<>();
+            g.add(searchResult);
+            searchTree.insert(word, g);
+        } else {
+            results.add(searchResult);
         }
-        else {
-        	results.add(searchResult);
-        }
-       
-        
-        
-        
-//        List<ISearchResult> resultList = tree.search(word);
-//        if (resultList == null) {
-//            resultList = new ArrayList<>();
-//            resultList.add(searchResult);
-//            tree.insert(word, resultList);
-//        } else {
-//            resultList.add(searchResult);
-//        }
     }
+
     @Override
     public void indexWebPage(String filePath) {
-//        if(searchTree.search(filePath)!=null)return ;
-    	if(filePaths.contains(filePath) == true) return;
         if (filePath == null) throw new RuntimeErrorException(new Error());
         List<SearchResult> ans = new ArrayList<>();
         File file = new File(filePath);
-        if (!file.exists()) return;
+        if (!file.exists()) throw new RuntimeErrorException(new Error());
+        ;
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder;
         Document doc;
@@ -95,36 +75,47 @@ public class SearchEngine implements ISearchEngine {
             e.printStackTrace();
             return;
         }
-        filePaths.add(filePath);
-        IBTree<String, List<ISearchResult>> wordsBtree = new BTree<>(5);
         NodeList nodeList = doc.getElementsByTagName("doc");
         for (int i = 0; i < nodeList.getLength(); i++) {
-            indexDoc((Element) nodeList.item(i));
+        	if(!containedIDs.contains(((Element) nodeList.item(i)).getAttribute("id"))) {
+        		 indexDoc((Element) nodeList.item(i));
+        	}
+        	if(deletedIDs.contains(((Element) nodeList.item(i)).getAttribute("id"))) {
+        		deletedIDs.remove(((Element) nodeList.item(i)).getAttribute("id"));
+        	}
+        	 
         }
-
+       
+        IndexedWebPage.add(filePath);
     }
 
     @Override
     public void indexDirectory(String directoryPath) {
         if (directoryPath == null) throw new RuntimeErrorException(new Error());
-  	  	try (Stream<Path> walk = Files.walk(Paths.get(directoryPath))) {
+        if(!new File(directoryPath).exists())throw new RuntimeErrorException(new Error());
+        try (Stream<Path> walk = Files.walk(Paths.get(directoryPath))) {
 
-  			List<String> result = walk.filter(Files::isRegularFile)
-  					.map(x -> x.toString()).collect(Collectors.toList());
-  			
-  			for(int i = 0 ; i < result.size() ; i++) {
-  				this.indexWebPage(result.get(i));
-  			}
-  		} catch (IOException e) {
-  			e.printStackTrace();
-  		}
+            List<String> result = walk.filter(Files::isRegularFile)
+                    .map(x -> x.toString()).collect(Collectors.toList());
+
+            for (int i = 0; i < result.size(); i++) {
+                this.indexWebPage(result.get(i));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void deleteWebPage(String filePath) {
         if (filePath == null) throw new RuntimeErrorException(new Error());
+        if(!IndexedWebPage.contains(filePath)) {
+        	throw new RuntimeErrorException(new Error());
+        }
+        List<SearchResult> ans = new ArrayList<>();
         File file = new File(filePath);
-        if (!file.exists()) return;
+        if (!file.exists()) throw new RuntimeErrorException(new Error());
+        ;
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder;
         Document doc;
@@ -137,21 +128,24 @@ public class SearchEngine implements ISearchEngine {
         }
         NodeList nodeList = doc.getElementsByTagName("doc");
         for (int i = 0; i < nodeList.getLength(); i++) {
-        	String deletedId =  ((Element) nodeList.item(i)).getAttribute("id");
-        	this.deletedIDs.add(deletedId); 	
+            String deletedId = ((Element) nodeList.item(i)).getAttribute("id");
+            containedIDs.remove(deletedId);
+            this.deletedIDs.add(deletedId);
+
         }
     }
 
     @Override
     public List<ISearchResult> searchByWordWithRanking(String word) {
         if (word == null) throw new RuntimeErrorException(new Error());
-        List<ISearchResult> results =  this.searchTree.search(word);
-        //Lazy Deletion,delete the search result if its web page is deleted.
-        for(int i = 0 ; i < results.size() ; i++) {
-//        	System.out.println(results.get(i).getId());
-        	if(  deletedIDs.contains(results.get(i).getId() )  ) {
-        		results.remove(i);
-        	}
+        word = word.toLowerCase();
+        List<ISearchResult> results = this.searchTree.search(word);
+        if (results == null) return new ArrayList<>();
+        for (int i = 0; i < results.size(); i++) {
+            if (deletedIDs.contains(results.get(i).getId())) {
+                results.remove(i);
+                i--;
+            }
         }
         return results;
     }
@@ -159,6 +153,37 @@ public class SearchEngine implements ISearchEngine {
     @Override
     public List<ISearchResult> searchByMultipleWordWithRanking(String sentence) {
         if (sentence == null) throw new RuntimeErrorException(new Error());
-        return null;
+        String[] words = sentence.split("\\s+");
+        List<ISearchResult> results = new ArrayList<>();
+        HashMap<String, List<Integer>> hashMap = new HashMap<>();
+        for (int i = 0; i < words.length; i++) {
+            List<ISearchResult> wordResult = searchByWordWithRanking(words[i]);
+            if (wordResult != null) {
+                for (int j = 0; j < wordResult.size(); j++) {
+                    ISearchResult result = wordResult.get(j);
+                    if (hashMap.containsKey(result.getId())) {
+                        hashMap.get(result.getId()).add(result.getRank());
+                    } else {
+                        List<Integer> l = new ArrayList<>();
+                        l.add(result.getRank());
+                        hashMap.put(result.getId(), l);
+                    }
+                }
+            }
+        }
+        Iterator it = hashMap.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, List<Integer>> entry = (Map.Entry) it.next();
+            String id = entry.getKey();
+            List<Integer> fuckinListCantFindAName = entry.getValue();
+            if (fuckinListCantFindAName.size() == words.length) {
+                int min = Integer.MAX_VALUE;
+                for (int k = 0; k < fuckinListCantFindAName.size(); k++) {
+                    min = Math.min(min, fuckinListCantFindAName.get(k));
+                }
+                results.add(new SearchResult(id, min));
+            }
+        }
+        return results;
     }
 }

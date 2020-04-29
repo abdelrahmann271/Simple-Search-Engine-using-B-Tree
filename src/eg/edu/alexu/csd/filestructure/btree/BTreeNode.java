@@ -3,6 +3,7 @@ package eg.edu.alexu.csd.filestructure.btree;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 public class BTreeNode<K extends Comparable<K>, V> implements IBTreeNode<K, V> {
 
@@ -12,7 +13,7 @@ public class BTreeNode<K extends Comparable<K>, V> implements IBTreeNode<K, V> {
 	private List<K> keys = new ArrayList<K>();
 	private List<V> values = new ArrayList<V>();;
 	private List<IBTreeNode<K, V>> children = new ArrayList<IBTreeNode<K,V>>();
-
+    private IBTreeNode<K, V> parent;
 	
 	public BTreeNode(int numOfChilds) {
 		// TODO Auto-generated constructor stub
@@ -78,8 +79,16 @@ public class BTreeNode<K extends Comparable<K>, V> implements IBTreeNode<K, V> {
 	public void setChildren(List<IBTreeNode<K, V>> children) {
 		// TODO Auto-generated method stub
 		this.children = children;
+		for(IBTreeNode<K, V> child : children) {
+			((BTreeNode<K, V>)child).setparent(this);
+		}
 	}
-
+    public void setparent(IBTreeNode<K, V> parent) {
+    	this.parent=parent;
+    }
+    public IBTreeNode<K, V> getparent(){
+    	return this.parent;
+    }
 	
 
 }
